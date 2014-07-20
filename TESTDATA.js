@@ -1,4 +1,26 @@
-TESTDATA = [
+var generateSampleVector = function(numberOfPoints, minValue, maxValue) {
+    numberOfPoints = numberOfPoints || 500;
+    minValue = minValue || -5;
+    maxValue = maxValue || 5;
+
+    var vectors = [];
+    for (var i = 0; i < numberOfPoints; i++) {
+        var x = Math.random() * (maxValue - minValue) + minValue,
+            y = Math.random() * (maxValue - minValue) + minValue,
+            z = Math.random() * (maxValue - minValue) + minValue,
+            vector = new Vector(x, y, z);
+
+        vectors.push(vector);
+    }
+
+    return vectors;
+};
+
+SAMPLE_DATA = generateSampleVector(500, -5, 5);
+
+SAMPLE_CLUSTER_DATA = vectorsToClusters(SAMPLE_DATA);
+
+TEST_DATA = [
     new Vector(5, 16, 0),
     new Vector(5, 9, 0),
     new Vector(8, 13, 0),
@@ -11,4 +33,4 @@ TESTDATA = [
     new Vector(18, 17, 0),
 ];
 
-TESTCLUSTERDATA = vectorsToClusters(TESTDATA);
+TEST_CLUSTER_DATA = vectorsToClusters(TEST_DATA);

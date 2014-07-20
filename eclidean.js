@@ -1,27 +1,3 @@
-function factorial(n) {
-    return (n < 2) ? 1 : factorial(n - 1) * n;
-}
-
-var generateSampleVector = function(numberOfPoints, minValue, maxValue) {
-    numberOfPoints = numberOfPoints || 500;
-    minValue = minValue || -5;
-    maxValue = maxValue || 5;
-
-    var vectors = [];
-    for (var i = 0; i < numberOfPoints; i++) {
-        var x = Math.random() * (maxValue - minValue) + minValue,
-            y = Math.random() * (maxValue - minValue) + minValue,
-            z = Math.random() * (maxValue - minValue) + minValue,
-            vector = new Vector(x, y, z);
-
-        vectors.push(vector);
-    }
-
-    return vectors;
-};
-
-SAMPLEDATA = generateSampleVector(500, -5, 5);
-
 var generateDistances = function(vectors) {
     var distances = [];
 
@@ -48,7 +24,19 @@ var asCluster = function(vector) {
     return new Cluster(vector);
 };
 
-CLUSTERS = vectorsToClusters(SAMPLEDATA);
+var groupClusters = function(clusterData, clusterMethod, k) {
+    console.time("CLUSTERS");
+    var clusters = clusterData.slice(0);
+    while (clusters.length > k) {
+        var nearestClusterGroup = clusterMethod(clusters)[0];
+        clusters.remove(nearestClusterGroup.left);
+        clusters.remove(nearestClusterGroup.right);
+        clusters.push(nearestClusterGroup.left.merge(nearestClusterGroup.right));
+    }
+
+    console.timeEnd("CLUSTERS");
+    return clusters;
+}
 
 var generateClusterDistances = function(clusters, distanceTransform) {
     var distances = [];
@@ -67,21 +55,6 @@ var generateClusterDistances = function(clusters, distanceTransform) {
     else
         return distances;
 };
-
-var groupClusters = function(clusterData, clusterMethod, k) {
-	console.time("CLUSTERS");
-    var clusters = clusterData.slice(0);
-    while (clusters.length > k) {
-        var nearestClusterGroup = clusterMethod(clusters)[0];
-        clusters.remove(nearestClusterGroup.left);
-        clusters.remove(nearestClusterGroup.right);
-        clusters.push(nearestClusterGroup.left.merge(nearestClusterGroup.right));
-    }
-
-    console.timeEnd("CLUSTERS");
-    return clusters;
-}
-
 
 var getNearestPointDistance = function(clusterA, clusterB) {
     var distances = clusterA.distancesTo(clusterB);
