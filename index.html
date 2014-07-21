@@ -9,6 +9,7 @@
     <script type="text/javascript" src="TESTDATA.js"></script>
     <script type="text/javascript" src="test.js"></script>
     <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="main.js"></script>
     <style>
     td {
         padding: 10px;
@@ -17,73 +18,93 @@
     </style>
 </head>
 
-</html>
-
-<html>
-<!-- 
-<head>
-    <link rel="stylesheet" href="bower_components\bootstrap\dist\css\bootstrap.min.css">
-    
-    <script type="text/javascript" src="main.js"></script>
-</head>
-
-<body ng-app="AssociationMining">
+<body ng-app="EuclideanSpace">
     <div ng-controller="Main">
-        </br>       
-        <div style="position:absolute; top:15px; rigth:15px;">
-            <h1>Transactions</h1>
-            <label>
-                Database
-                <select ng-model="database">
-                    <option value="0">Zero</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                    <option value="4">Four</option>
-                    <option value="5">Five</option>
-                </select>
-            </label>
-            <button ng-click="loadDatabase()">Load Database</button>
-            </br>
-            <table>
+        <h1>Find S'</h1>
+
+        Sample Size
+        <input type="number" ng-model="params.sampleSize" />
+        </br>
+        P
+        <input type="number" placeholder="p" ng-model="params.p" />
+        </br>
+        D
+        <input type="number" placeholder="D" ng-model="params.D" />
+        </br>
+        k
+        <input type="number" placeholder="k" ng-model="params.k" />
+        </br>
+        Min
+        <input type="number" placeholder="Min Value" ng-model="params.minValue" />
+        </br>
+        Max
+        <input type="number" placeholder="Max Value" ng-model="params.maxValue" />
+        </br>
+        <button ng-click="filterOutliers()">Filter Outliers</button>
+        <div style="overflow-y: auto;">
+        </br>
+        </br>
+            <div> No available outliers</div>
+            <!-- <table>
                 <thead>
                     <tr>
-                        <td>Products</td>
-                        <td>Purchase Date</td>
+                        <td>id</td>
+                        <td>X</td>
+                        <td>Y</td>
+                        <td>Z</td>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="transaction in transactions">
+                    <tr ng-repeat="vector in S">
                         <td>
-                            <div ng-repeat="p in transaction.products">
-                                {{p.name}}
-                            </div>
+                            {{vector.id}}
                         </td>
-                        <td>{{transaction.date | date:'shortDate'}}</td>
+                        <td>
+                            {{vector.x}}
+                        </td>
+                        <td>
+                            {{vector.y}}
+                        </td>
+                        <td>
+                            {{vector.z}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table> -->
+        </div>
+        <!--  <h1>Distances</h1>
+        <button ng-click="generateDistanceResult()">Generate Distances</button>
+        <div style="overflow-y: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <td>Left</td>
+                        <td>Right</td>
+                        <td>Distance</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="distance in distanceResult">
+                        <td>
+                            {{distance.left.id}}
+                        </td>
+                        <td>
+                            {{distance.right.id}}
+                        </td>
+                        <td>
+                            {{distance.distance}}
+                        </td>
                     </tr>
                 </tbody>
             </table>
-        </div>
+        </div> -->
         </br>
-        <div style="position:absolute; top:15px; right:0;">
-            <h1>Rules</h1>
-            <label>
-                Support
-                <input type="number" value="0" max="1" ng-model="support"></input>
-            </label>
-            <label>
-                Confidence
-                <input type="number" value="0" max="1" ng-model="confidence"></input>
-            </label>
-            <button ng-click="getAssociations()">Load</button>
-            <ul>
-                <li ng-repeat="rule in associationRules">
-                    {{rule.left}} -> {{rule.right}} [{{rule.support}} % {{rule.confidence}} %]
-                </li>
-            </ul>
-        </div>
-        <button style="position:absolute; right:0; top:0" ng-click="clear()">Clear</button>
+        <!-- 
+        <div style="float:right; top:15px; rigth:15px;">
+            <h1>Hierarchical Agglomerative Clustering</h1>
+
+        </div> -->
     </div>
 </body>
 
-</html> -->
+</html>
