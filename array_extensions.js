@@ -14,3 +14,21 @@ Array.prototype.remove = function(item) {
 
     return this;
 };
+
+Array.prototype.min = function() {
+    return Math.min.apply(Math, this);
+};
+
+Array.prototype.sum = function() {
+    return this.reduce(function(a, b) {
+        return a + b;
+    });
+};
+
+Array.prototype.average = function() {
+    return this.sum() / this.length;
+}
+
+Array.prototype.excluding = function(item) {
+    return this.slice(0).remove(item);
+}

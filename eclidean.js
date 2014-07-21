@@ -1,3 +1,21 @@
+var generateRandomVectors = function(numberOfPoints, minValue, maxValue) {
+    numberOfPoints = numberOfPoints || 500;
+    minValue = minValue || -5;
+    maxValue = maxValue || 5;
+
+    var vectors = [];
+    for (var i = 0; i < numberOfPoints; i++) {
+        var x = Math.random() * (maxValue - minValue) + minValue,
+            y = Math.random() * (maxValue - minValue) + minValue,
+            z = Math.random() * (maxValue - minValue) + minValue,
+            vector = new Vector(x, y, z);
+
+        vectors.push(vector);
+    }
+
+    return vectors;
+};
+
 var generateDistanceGroups = function(vectors) {
     var distances = [];
 
@@ -17,11 +35,9 @@ var generateDistanceGroups = function(vectors) {
 };
 
 var vectorsToClusters = function(vectors) {
-    return vectors.map(asCluster)
-};
-
-var asCluster = function(vector) {
-    return new Cluster(vector);
+    return vectors.map(function(vector) {
+        return vector.asCluster();
+    })
 };
 
 var getMinimumNeighborhood = function(nextVector, vectors, M, D) {
@@ -43,7 +59,7 @@ var getMinimumNeighborhood = function(nextVector, vectors, M, D) {
 
 var findOutliers = function(T, p, D) {
     var N = T.length;
-    var M = parseFloat((N * (1 - p)).toPrecision(15)); //ARRG FLOATING POINTS!!!!
+    var M = parseFloat((N * (1 - p)).toPrecision(15)); // FLOATING POINTS!!!!
     var vectors = T.slice(0);
     var nonOutliers = [];
 
@@ -62,7 +78,7 @@ var findOutliers = function(T, p, D) {
 }
 
 var groupClusters = function(clusterData, clusterMethod, k) {
-    console.time("CLUSTERS");
+    // console.time("cluster");
     var clusters = clusterData.slice(0);
     while (clusters.length > k) {
         var nearestClusterGroup = clusterMethod(clusters)[0];
@@ -71,9 +87,46 @@ var groupClusters = function(clusterData, clusterMethod, k) {
         clusters.push(nearestClusterGroup.left.merge(nearestClusterGroup.right));
     }
 
-    console.timeEnd("CLUSTERS");
+    // console.timeEnd("cluster");
     return clusters;
 }
+
+var averageDistance = function(vector, otherVectors) {
+    if (otherVectors.length == 0)
+        return 0;
+
+    var distances = vector.distancesTo(otherVectors);
+    var sum = distances.reduce(function(a, b) {
+        return a + b;
+    });
+    return sum / distances.length;
+}
+
+var getSilhouetteCoefficient = function(clusters) {
+    var silhouetteCoefficients = [];
+
+    if (clusters.length == 1)
+        return [1];
+
+    for (var i = 0; i < clusters.length; i++) {
+        var currentCluster = clusters[i];
+        for (var j = 0; j < currentCluster.vectors.length; j++) {
+            var currentVector = currentCluster.vectors[j];
+            var a = averageDistance(currentVector, currentCluster.vectors.excluding(currentVector));
+            var b = clusters.filter(function(cluster) {
+                return cluster.id != currentCluster.id;
+            }).map(function(cluster) {
+                return averageDistance(currentVector, cluster.vectors)
+            }).min();
+
+            var s = parseFloat(((b - a) / Math.max(a, b)).toFixed(2));
+
+            silhouetteCoefficients.push(s);
+        }
+    }
+
+    return silhouetteCoefficients;
+};
 
 var generateClusterDistanceGroups = function(clusters, distanceTransform) {
     var distances = [];
