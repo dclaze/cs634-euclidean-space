@@ -34,3 +34,18 @@ TEST_DATA = [
 ];
 
 TEST_CLUSTER_DATA = vectorsToClusters(TEST_DATA);
+
+
+SIMPLE_DATA = [
+    new Vector(0, 0, 0),
+    new Vector(5, 5, 0),
+    new Vector(5, 0, 0),
+    new Vector(0, 5, 0),
+    new Vector(2.5, 2.5, 0)
+];
+
+A = SIMPLE_DATA[0];
+B = SIMPLE_DATA[1];
+C = SIMPLE_DATA[2];
+D = SIMPLE_DATA[3];
+E = SIMPLE_DATA[4];

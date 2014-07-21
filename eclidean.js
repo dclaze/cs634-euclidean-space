@@ -1,4 +1,4 @@
-var generateDistances = function(vectors) {
+var generateDistanceGroups = function(vectors) {
     var distances = [];
 
     var nextVector = vectors.pop();
@@ -11,7 +11,7 @@ var generateDistances = function(vectors) {
     }
 
     if (vectors.length > 1)
-        return distances.concat(generateDistances(vectors));
+        return distances.concat(generateDistanceGroups(vectors));
     else
         return distances;
 };
@@ -23,6 +23,43 @@ var vectorsToClusters = function(vectors) {
 var asCluster = function(vector) {
     return new Cluster(vector);
 };
+
+var getMinimumNeighborhood = function(nextVector, vectors, M, D) {
+    var neighborhood = [];
+    var sortedDistancesToOtherVectorsWithinRadius =
+        nextVector.distancesTo(vectors)
+        .sort(function(a, b) {
+            return b - a;
+        });
+    while (sortedDistancesToOtherVectorsWithinRadius.length && neighborhood.length < (M + 1)) {
+        var nextDistance = sortedDistancesToOtherVectorsWithinRadius.pop();
+        if (nextDistance > D)
+            break;
+        neighborhood.push(nextDistance);
+    }
+
+    return neighborhood;
+}
+
+var findOutliers = function(T, p, D) {
+    var N = T.length;
+    var M = parseFloat((N * (1 - p)).toPrecision(15)); //ARRG FLOATING POINTS!!!!
+    var vectors = T.slice(0);
+    var nonOutliers = [];
+
+    for (var i = 0; i < vectors.length; i++) {
+        var nextVector = vectors[i],
+            otherVectors = vectors.filter(function(vector) {
+                return vector.id != nextVector.id;
+            });
+
+        var neighborhood = getMinimumNeighborhood(nextVector, otherVectors, M, D);
+        if (neighborhood.length >= M)
+            nonOutliers.push(nextVector);
+    }
+
+    return vectors.remove.apply(vectors, nonOutliers);
+}
 
 var groupClusters = function(clusterData, clusterMethod, k) {
     console.time("CLUSTERS");
@@ -38,7 +75,7 @@ var groupClusters = function(clusterData, clusterMethod, k) {
     return clusters;
 }
 
-var generateClusterDistances = function(clusters, distanceTransform) {
+var generateClusterDistanceGroups = function(clusters, distanceTransform) {
     var distances = [];
 
     var nextCluster = clusters.pop();
@@ -51,7 +88,7 @@ var generateClusterDistances = function(clusters, distanceTransform) {
     }
 
     if (clusters.length > 1)
-        return distances.concat(generateClusterDistances(clusters, distanceTransform));
+        return distances.concat(generateClusterDistanceGroups(clusters, distanceTransform));
     else
         return distances;
 };
@@ -65,7 +102,7 @@ var getNearestPointDistance = function(clusterA, clusterB) {
 };
 
 var getNearest = function(clusters) {
-    var distanceGroups = generateClusterDistances(clusters.slice(0), getNearestPointDistance)
+    var distanceGroups = generateClusterDistanceGroups(clusters.slice(0), getNearestPointDistance)
         .sort(function(a, b) {
             return a.distance - b.distance;
         });
@@ -82,7 +119,7 @@ var getFarthestPointDistance = function(clusterA, clusterB) {
 };
 
 var getFarthest = function(clusters) {
-    var distanceGroups = generateClusterDistances(clusters.slice(0), getFarthestPointDistance)
+    var distanceGroups = generateClusterDistanceGroups(clusters.slice(0), getFarthestPointDistance)
         .sort(function(a, b) {
             return b.distance - a.distance;
         });
@@ -101,7 +138,7 @@ var getAveragePointDistance = function(clusterA, clusterB) {
 };
 
 var getAverage = function(clusters) {
-    var distanceGroups = generateClusterDistances(clusters.slice(0), getAveragePointDistance)
+    var distanceGroups = generateClusterDistanceGroups(clusters.slice(0), getAveragePointDistance)
         .sort(function(a, b) {
             return a.distance - b.distance;
         });
@@ -117,7 +154,7 @@ var getCenterPointDistance = function(clusterA, clusterB) {
 };
 
 var getCenter = function(clusters) {
-    var distanceGroups = generateClusterDistances(clusters.slice(0), getCenterPointDistance)
+    var distanceGroups = generateClusterDistanceGroups(clusters.slice(0), getCenterPointDistance)
         .sort(function(a, b) {
             return a.distance - b.distance;
         });
